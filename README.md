@@ -10,6 +10,10 @@ Upload geojson data and start chat & mapping (USA, NYC and pakistan data is prov
 <img width="975" height="252" alt="image" src="https://github.com/user-attachments/assets/06d93028-bc49-4ea5-bba3-4034c7272c8a" />
 <img width="1086" height="174" alt="image" src="https://github.com/user-attachments/assets/02b5be74-499c-4aa3-bf6a-7f5c38ab0f8a" />
 <img width="798" height="826" alt="image" src="https://github.com/user-attachments/assets/b5e0a53e-4e44-4978-bb17-0ab05ebd8db2" />
+<img width="975" height="90" alt="image" src="https://github.com/user-attachments/assets/947fa799-cf00-4ed1-8397-8df945c197ba" />
+<img width="975" height="74" alt="image" src="https://github.com/user-attachments/assets/e7808b6d-c529-4447-9d08-0ade2937b5ed" />
+<img width="966" height="1033" alt="image" src="https://github.com/user-attachments/assets/e200d256-47ce-41f4-9bf6-d23f80ac5320" />
+
 
 
 
