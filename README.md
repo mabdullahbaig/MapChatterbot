@@ -1,4 +1,4 @@
-<img width="1086" height="174" alt="image" src="https://github.com/user-attachments/assets/470f11b3-43b0-4c7b-8a8e-88ac2a263dc1" /># MapChatterbot
+
 This is a Flask-based web application that enables users to generate customized maps using natural language prompts, accompanied by a secure user login system.
 
 <img width="975" height="524" alt="image" src="https://github.com/user-attachments/assets/d707fe4e-32a6-45b2-8ec5-7806163ecc93" />
