@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+<style>
+/* Base styles remain the same */
+
+/* Reduced header height */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.1rem 0; /* Even further reduced vertical padding */
+    border-bottom: 0.2px solid #eee;
+    margin-bottom: 0.3rem; /* Even further reduced margin */
+    height: auto;
+}
+
+.app-header h1 {
+    font-size: 1.2em; /* Slightly reduced title size */
+    margin: 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Reduced gap */
+}
+
+.user-info span {
+    font-size: 0.9em;
+}
+
+.logout-btn {
+    font-size: 0.9em;
+    color: #e74c3c;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.logout-btn:hover {
+    color: #c0392b;
+    text-decoration: underline;
+}
+
+/* Main content takes full width and height till header */
+.main-content {
+    width: 100%;
+    height: calc(100vh - 83px); /* Adjust 60px based on actual header height */
+    display: flex;
+    flex-direction: column; /* Stack chat section */
+}
+
+/* Chat section takes full available space within main content */
+.chat-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Occupy remaining vertical space */
+}
+
+/* Chat history takes most of the vertical space */
+#chatHistory {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    min-height: 40%; /* Adjust as needed */
+}
+
+/* Input area now contains the upload section */
+.input-area {
+    display: flex;
+    gap: 0.2rem;
+    padding: 0.2rem;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    align-items: center;
+}
+
+/* Upload container styles for within the input area */
+.upload-container {
+    border: 1px dashed #ccc;
+    padding: 5px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    box-sizing: border-box;
+    margin-right: 0.5rem;
+}
+
+.upload-area {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+}
+
+.upload-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: #ccc;
+    margin-right: 5px;
+}
+
+.upload-text h3 {
+    margin: 0;
+    color: #555;
+    font-size: 0.8em;
+}
+
+.upload-text p {
+    margin: 0;
+    color: #777;
+    font-size: 0.7em;
+}
+
+.browse-link {
+    color: #007bff;
+    cursor: pointer;
+}
+
+.file-preview {
+    border: 1px solid #ddd;
+    padding: 3px;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: auto;
+    box-sizing: border-box;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+}
+
+.file-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: #6c757d;
+    margin-right: 3px;
+}
+
+.file-details h4 {
+    font-size: 0.8em;
+    margin: 0;
+    color: #333;
+}
+
+.file-meta {
+    font-size: 0.6em;
+    color: #6c757d;
+}
+
+.progress-container {
+    background-color: #f3f3f3;
+    border-radius: 2px;
+    height: 4px;
+    margin-top: 2px;
+    overflow: hidden;
+    position: relative;
+    width: 60px;
+}
+
+.progress-bar {
+    background-color: #007bff;
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+}
+
+.progress-percent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.5em;
+}
+
+.cancel-btn {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 0.8em;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    margin-left: 3px;
+}
+
+/* Larger textarea */
+textarea {
+    flex-grow: 1;
+    padding: 0.8rem; /* Increased padding */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical; /* Allow vertical resizing */
+    font-size: 1em; /* Slightly larger font size */
+    min-height: 60px; /* Increased min height */
+    max-height: 200px; /* Increased max height */
+}
+
+.send-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 0.8rem 1rem; /* Increased padding */
+    border-radius: 4px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.send-btn:hover {
+    background: #2980b9;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <header class="app-header">
+        <h1>MapChatterBot</h1>
+        <div class="user-info">
+            <span>{{ current_user.name }}</span>
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="chat-section">
+            <div id="chatHistory" class="chat-history"></div>
+
+            <div class="input-area">
+                <div class="upload-container">
+                    <input type="file" id="fileUpload" accept=".geojson,.json,.shp,.shx,.dbf,.prj,.zip,.tif,.tiff" style="display: none;">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"></path></svg>
+                        </div>
+                        <div class="upload-text">
+                            <h3>Upload</h3>
+                            <p class="browse-link">Browse</p>
+                        </div>
+                    </div>
+                    <div class="file-preview" id="filePreview" style="display: none;">
+                        <div class="file-info">
+                            <div class="file-icon">
+                                <svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2Z"></path></svg>
+                            </div>
+                            <div class="file-details">
+                                <h4 class="file-name" id="fileName">filename.geojson</h4>
+                                <div class="file-meta">
+                                    <span class="file-size" id="fileSize">2.4 MB</span>
+                                    <span class="file-status" id="fileStatus">Ready</span>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-bar" id="progressBar">
+                                        <div class="progress-fill"></div>
+                                    </div>
+                                    <span class="progress-percent" id="progressPercent">0%</span>
+                                </div>
+                            </div>
+                            <button class="cancel-btn" id="cancelUpload">×</button>
+                        </div>
+                    </div>
+                </div>
+                <textarea id="userInput" placeholder="Ask about your data or request visualizations..."></textarea>
+                <button id="sendBtn" class="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileUpload = document.getElementById('fileUpload');
+        const uploadArea = document.getElementById('uploadArea');
+        const filePreview = document.getElementById('filePreview');
+        const fileNameDisplay = document.getElementById('fileName');
+        const fileSizeDisplay = document.getElementById('fileSize');
+        const fileStatusDisplay = document.getElementById('fileStatus');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const cancelUploadButton = document.getElementById('cancelUpload');
+        const browseLink = uploadArea.querySelector('.browse-link');
+        const chatHistory = document.getElementById('chatHistory');
+
+        browseLink.addEventListener('click', () => {
+            fileUpload.click();
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileUpload.addEventListener('change', () => {
+            handleFiles(fileUpload.files);
+        });
+
+        cancelUploadButton.addEventListener('click', () => {
+            filePreview.style.display = 'none';
+            uploadArea.style.display = 'flex';
+            fileUpload.value = '';
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                fileNameDisplay.textContent = file.name;
+                fileSizeDisplay.textContent = formatFileSize(file.size);
+                fileStatusDisplay.textContent = 'Ready';
+                progressBar.style.width = '0%';
+                progressPercent.textContent = '0%';
+                uploadArea.style.display = 'none';
+                filePreview.style.display = 'flex';
+                // In a real application, you would initiate the upload here.
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function scrollToBottom() {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.textContent = text;
+            chatHistory.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Example usage:
+        // addMessage("Hello!", "user");
+        // addMessage("Hi there!", "ai");
+        // if (filePreview.style.display === 'flex') {
+        //     fileStatusDisplay.textContent = 'Uploading...';
+        //     setTimeout(() => {
+        //         fileStatusDisplay.textContent = 'Upload complete';
+        //         addMessage(`${fileNameDisplay.textContent} uploaded successfully.`, 'ai');
+        //         filePreview.style.display = 'none';
+        //         uploadArea.style.display = 'flex';
+        //         fileUpload.value = '';
+        //     }, 3000); // Simulate upload time
+        // }
+    });
+</script>
+{% endblock %}
